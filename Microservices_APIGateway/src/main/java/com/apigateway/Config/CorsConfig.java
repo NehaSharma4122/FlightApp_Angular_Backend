@@ -1,12 +1,12 @@
 package com.apigateway.Config;
 
-import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
-// IMPORTANT: Notice the ".reactive." in the package below
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 public class CorsConfig {
@@ -15,14 +15,15 @@ public class CorsConfig {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration corsConfig = new CorsConfiguration();
         
-        // Use setAllowedOriginPatterns for better compatibility
+        // Use setAllowedOriginPatterns to avoid issues with "*"
         corsConfig.setAllowedOriginPatterns(Arrays.asList("http://localhost:4200"));
         corsConfig.setMaxAge(3600L);
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        corsConfig.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization"));
+        corsConfig.setAllowedHeaders("*");
         corsConfig.setAllowCredentials(true);
+        corsConfig.addAllowedOrigin("http://localhost:4200");
+        corsConfig.setExposedHeaders(Arrays.asList("Authorization"));
 
-        // MUST use the reactive version of Source
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);
 
