@@ -9,7 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class SignupResponse {
 
-	 private String username;
-	    private String email;
-	    private String encryptedPassword;
+	private String username;
+	private String email;
+	private String encryptedPassword;
 }

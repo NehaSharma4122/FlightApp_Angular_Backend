@@ -9,6 +9,7 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.http.HttpMethod; // <--- ADD THIS LINE
 
 import com.apigateway.jwt.JWTUtils;
 import com.apigateway.repository.BlacklistedTokenRepository;
@@ -17,14 +18,16 @@ import com.apigateway.repository.BlacklistedTokenRepository;
 @RequiredArgsConstructor
 public class JWTAuthFilter extends AbstractGatewayFilterFactory<Object> {
 
-    private final JWTUtils jwtUtils;
+    private final JWTUtils jWTUtils;
     private final BlacklistedTokenRepository blacklistedTokenRepository;
 
     @Override
     public GatewayFilter apply(Object config) {
 
         return (exchange, chain) -> {
-
+            if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
+                return chain.filter(exchange); // Skip JWT check for preflight
+            }
             String authHeader = exchange.getRequest()
                     .getHeaders()
                     .getFirst(HttpHeaders.AUTHORIZATION);
@@ -35,7 +38,7 @@ public class JWTAuthFilter extends AbstractGatewayFilterFactory<Object> {
 
             String token = authHeader.substring(7);
 
-            if (!jwtUtils.validate(token)) {
+            if (!jWTUtils.validate(token)) {
                 return unauthorized(exchange);
             }
             System.out.println("JWT FILTER HIT");
